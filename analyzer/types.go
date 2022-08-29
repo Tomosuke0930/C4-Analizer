@@ -147,7 +147,8 @@ func (f Finding) String() string {
 	// change from :: >> #L
 	// return fmt.Sprintf("%s#L%d => %s\n", f.File, f.LineNumber, f.LineContent)
 	var link = fmt.Sprintf("https://github.com/code-423n4/%s#L%d ", f.File, f.LineNumber)
-	return fmt.Sprintf("[" + f.LineContent + "]" + "("+ link +")"+"\n")
+	var files = fmt.Sprintf("%s#L%d", f.File, f.LineNumber)
+	return fmt.Sprintf("```"+files+"``` "+"[" +  f.LineContent  + "]" + "("+ link +")"+"\n")
 }
 
 func (s Severity) String() string {
