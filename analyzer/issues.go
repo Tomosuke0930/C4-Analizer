@@ -7,13 +7,20 @@ func AllIssues() []Issue {
 
 // GasOpIssues returns the list of all gas optimization issues.
 func GasOpIssues() []Issue {
+	/*
+	Identifier string
+	Severity   Severity
+	Title      string
+	Link       string
+	Pattern    string	
+	*/
 	return []Issue{
 		// G001 - Don't Initialize Variables with Default Value
 		{
 			"G001",
 			GASOP,
 			"G-X: Don't Initialize Variables with Default Value",
-			"https://github.com/byterocket/c4-common-issues/blob/main/0-Gas-Optimizations.md#g001---dont-initialize-variables-with-default-value",
+			"Descrioption",
 			`(uint[0-9]*[[:blank:]][a-z,A-Z,0-9]*.?=.?0;)|(bool.[a-z,A-Z,0-9]*.?=.?false;)`,
 		},
 		// G002 - Cache Array Length Outside of Loop
