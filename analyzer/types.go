@@ -21,6 +21,7 @@ type Issue struct {
 	Severity   Severity
 	Title      string
 	Link       string
+	Reco       string
 	Pattern    string
 }
 
@@ -83,6 +84,10 @@ func (r Report) Markdown() string {
 		// Description
 		buf.WriteString("### Description\n")
 		buf.WriteString( issue.Link  + "\n")
+		buf.WriteString("\n")
+
+		buf.WriteString("### Recommendation\n")
+		buf.WriteString( issue.Reco  + "\n")
 		buf.WriteString("\n")
 
 		// Findings
