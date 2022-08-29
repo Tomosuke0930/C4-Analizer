@@ -59,42 +59,44 @@ func (r Report) Markdown() string {
 	//
 	buf := strings.Builder{}
 
-	buf.WriteString("# c4udit Report\n")
+	buf.WriteString("# Gas | QA \n")
 	buf.WriteString("\n")
 
-	buf.WriteString("## Files analyzed\n")
-	for _, f := range r.FilesAnalyzed {
-		buf.WriteString("- " + f + "\n")
-	}
+	// buf.WriteString("## Files analyzed\n")
+	// for _, f := range r.FilesAnalyzed {
+	// 	buf.WriteString("- " + f + "\n")
+	// }
+
 	buf.WriteString("\n")
 
-	buf.WriteString("## Issues found\n")
-	buf.WriteString("\n")
+	// buf.WriteString("## Issues found\n")
+	// buf.WriteString("\n")
 	for _, issue := range r.Issues {
 		findings := r.FindingsPerIssue[issue.Identifier]
 		if len(findings) == 0 {
 			continue
 		}
 
-		buf.WriteString("### " + issue.Title + "\n")
+		buf.WriteString("## " + issue.Title + "\n")
 		buf.WriteString("\n")
 
-		// Impact
-		buf.WriteString("#### Impact\n")
+		// Description
+		buf.WriteString("### Description\n")
 		buf.WriteString("Issue Information: [" + issue.Identifier + "]" + "(" + issue.Link + ")" + "\n")
 		buf.WriteString("\n")
 
 		// Findings
-		buf.WriteString("#### Findings:\n")
-		buf.WriteString("```\n")
+		buf.WriteString("### Findings:\n")
+		// buf.WriteString("```\n")
 		for _, finding := range findings {
 			buf.WriteString(finding.String())
+			buf.WriteString("\n")
 		}
-		buf.WriteString("```\n")
+		// buf.WriteString("```\n")
 
 		// Tools used
-		buf.WriteString("#### Tools used\n")
-		buf.WriteString("[c4udit](" + c4uditRepoLink + ")\n")
+		// buf.WriteString("#### Tools used\n")
+		// buf.WriteString("[c4udit](" + c4uditRepoLink + ")\n")
 
 		buf.WriteString("\n")
 	}
@@ -140,8 +142,12 @@ func (i Issue) String() string {
 	return i.Identifier
 }
 
+// buf.WriteString("Issue Information: [" + issue.Identifier + "]" + "(" + issue.Link + ")" + "\n")
 func (f Finding) String() string {
-	return fmt.Sprintf("%s::%d => %s\n", f.File, f.LineNumber, f.LineContent)
+	// change from :: >> #L
+	// return fmt.Sprintf("%s#L%d => %s\n", f.File, f.LineNumber, f.LineContent)
+	var link = fmt.Sprintf("https://github.com/code-423n4/%s#L%d ", f.File, f.LineNumber)
+	return fmt.Sprintf("[" + f.LineContent + "]" + "("+ link +")"+"\n")
 }
 
 func (s Severity) String() string {

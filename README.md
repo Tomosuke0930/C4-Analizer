@@ -15,17 +15,21 @@ Note that `c4udit` uses [c4-common-issues](https://github.com/byterocket/c4-comm
 First you need to have the Go toolchain installed. You can find instruction [here](https://go.dev/doc/install).
 
 Then install `c4udit` with:
+
 ```
 $ go install github.com/byterocket/c4udit@latest
 ```
 
 To just build the binary:
+
 ```
 $ git clone https://github.com/byterocket/c4udit
 $ cd c4udit/
 $ go build .
 ```
+
 Now you should be able to run `c4udit` with:
+
 ```
 $ ./c4udit
 ```
@@ -44,6 +48,7 @@ Flags:
 ## Example
 
 Running `c4udit` against the `examples` directory:
+
 ```
 $ ./c4udit examples/
 Files analyzed:
@@ -72,7 +77,6 @@ Issues found:
 
 Using the `-s` flag, `c4udit` will create a report in markdown format.
 For an example check out the report in the `examples` directory [here](./examples/c4udit-report.md).
-
 
 ## License
 

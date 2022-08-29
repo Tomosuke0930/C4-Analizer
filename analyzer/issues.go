@@ -12,7 +12,7 @@ func GasOpIssues() []Issue {
 		{
 			"G001",
 			GASOP,
-			"Don't Initialize Variables with Default Value",
+			"G-X: Don't Initialize Variables with Default Value",
 			"https://github.com/byterocket/c4-common-issues/blob/main/0-Gas-Optimizations.md#g001---dont-initialize-variables-with-default-value",
 			`(uint[0-9]*[[:blank:]][a-z,A-Z,0-9]*.?=.?0;)|(bool.[a-z,A-Z,0-9]*.?=.?false;)`,
 		},
@@ -20,7 +20,7 @@ func GasOpIssues() []Issue {
 		{
 			"G002",
 			GASOP,
-			"Cache Array Length Outside of Loop",
+			"G-X: Cache Array Length Outside of Loop",
 			"https://github.com/byterocket/c4-common-issues/blob/main/0-Gas-Optimizations.md#g002---cache-array-length-outside-of-loop",
 			".length",
 		},
@@ -28,7 +28,7 @@ func GasOpIssues() []Issue {
 		{
 			"G003",
 			GASOP,
-			"Use != 0 instead of > 0 for Unsigned Integer Comparison",
+			"G-X: Use != 0 instead of > 0 for Unsigned Integer Comparison",
 			"https://github.com/byterocket/c4-common-issues/blob/main/0-Gas-Optimizations.md#g003---use--0-instead-of--0-for-unsigned-integer-comparison",
 			"(>0|> 0)",
 		},
@@ -36,7 +36,7 @@ func GasOpIssues() []Issue {
 		{
 			"G006",
 			GASOP,
-			"Use immutable for OpenZeppelin AccessControl's Roles Declarations",
+			"G-X: Use immutable for OpenZeppelin AccessControl's Roles Declarations",
 			"https://github.com/byterocket/c4-common-issues/blob/main/0-Gas-Optimizations.md#g006---use-immutable-for-openzeppelin-accesscontrols-roles-declarations",
 			"keccak",
 		},
@@ -44,7 +44,7 @@ func GasOpIssues() []Issue {
 		{
 			"G007",
 			GASOP,
-			"Long Revert Strings",
+			"G-X: Long Revert Strings",
 			"https://github.com/byterocket/c4-common-issues/blob/main/0-Gas-Optimizations.md#g007---long-revert-strings",
 			"\".{33,}\"", // Anything between "'s with at least 33 characters
 		},
@@ -52,7 +52,7 @@ func GasOpIssues() []Issue {
 		{
 			"G008",
 			GASOP,
-			"Use Shift Right/Left instead of Division/Multiplication if possible",
+			"G-X: Use Shift Right/Left instead of Division/Multiplication if possible",
 			"https://github.com/byterocket/c4-common-issues/blob/main/0-Gas-Optimizations.md/#g008---use-shift-rightleft-instead-of-divisionmultiplication-if-possible",
 			`(/[2,4,8]|/ [2,4,8]|\*[2,4,8]|\* [2,4,8])`,
 		},
