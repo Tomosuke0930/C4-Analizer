@@ -44,7 +44,7 @@ const (
 
 // Markdown returns the report as string in markdown style.
 func (r Report) Markdown() string {
-	const c4uditRepoLink = "https://github.com/byterocket/c4udit"
+	// const c4uditRepoLink = "https://github.com/byterocket/c4udit"
 	// Issue output in Code4Rena format:
 	// ### {{ issue.Title }}
 	//
@@ -82,7 +82,7 @@ func (r Report) Markdown() string {
 
 		// Description
 		buf.WriteString("### Description\n")
-		buf.WriteString("Issue Information: [" + issue.Identifier + "]" + "(" + issue.Link + ")" + "\n")
+		buf.WriteString( issue.Link  + "\n")
 		buf.WriteString("\n")
 
 		// Findings
