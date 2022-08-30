@@ -187,32 +187,222 @@ func GasOpIssues() []Issue {
 // LowRiskIssues returns the list of all low risk issues.
 func LowRiskIssues() []Issue {
 	return []Issue{
-		// // L001 - Unsafe ERC20 Operation(s)
-		// {
-		// 	"L001",
-		// 	LOW,
-		// 	"Unsafe ERC20 Operation(s)",
-		// 	"https://github.com/byterocket/c4-common-issues/blob/main/2-Low-Risk.md#l001---unsafe-erc20-operations",
-		// 	"Reco",
-		// 	`\.transfer\(|\.transferFrom\(|\.approve\(`, // ".tranfer(", ".transferFrom(" or ".approve("
-		// },
-		// // L003 - Unspecific Compiler Version Pragma
-		// {
-		// 	"L003",
-		// 	LOW,
-		// 	"Unspecific Compiler Version Pragma",
-		// 	"https://github.com/byterocket/c4-common-issues/blob/main/2-Low-Risk.md#l003---unspecific-compiler-version-pragma",
-		// 	"Reco",
-		// 	"pragma solidity (\\^|>)", // "pragma solidity ^" or "pragma solidity >"
-		// },
-		// // L005 - Do not use Deprecated Library Functions
-		// {
-		// 	"L005",
-		// 	LOW,
-		// 	"Do not use Deprecated Library Functions",
-		// 	"https://github.com/byterocket/c4-common-issues/blob/main/2-Low-Risk.md#l005---do-not-use-deprecated-library-functions",
-		// 	"Reco",
-		// 	`_setupRole\(|safeApprove\(`, // _setupRole and safeApprove are common deprecated lib functions
-		// },
+		// L001 - Unsafe ERC20 Operation(s)
+		{
+			"L001",
+			LOW,
+			"L-X: Unsafe use of transfer()/transferFrom() with IERC20",
+			"Some tokens do not implement the ERC20 standard properly but are still accepted by most code that accepts ERC20 tokens.\nexample Tether (USDT)'s transfer() and transferFrom() functions do not return booleans as the specification requires, and instead have no return value. When these sorts of tokens are cast to IERC20, their function signatures do not match and therefore the calls made, revert.",
+			"Use OpenZeppelin's `SafeERC20` safeTransfer()/safeTransferFrom() instead",
+			`\.transfer\(|\.transferFrom\(|\.approve\(`, // ".tranfer(", ".transferFrom(" or ".approve("
+		},
+		{
+			"L002",
+			GASOP,
+			"L-X: `ecrecover()` not checked for signer address of zero",
+			"The `ecrecover()` function returns an address of zero when the signature does not match. This can cause problems if address zero is ever the owner of assets, and someone uses the permit function on address zero. ",
+			"You should check whether the return value is address(0) or not in terms of the security.",
+			"THIS_IS_TARGET", //ガンバ！
+		},
+		{
+			"L003",
+			GASOP,
+			"L-X: `_safeMint()` should be used rather than `_mint()` wherever possible",
+			"`_mint()` is discouraged in favor of `_safeMint()` which ensures that the recipient is either an EOA or implements `IERC721Receiver`. ",
+			"You should change from` _mint` to `_safeMint` in terms of security.",
+			"_mint",
+		},
+		{
+			"L004",
+			GASOP,
+			"L-X: Vulnerable to cross-chain replay attacks due to static DOMAIN_SEPARATOR/domainSeparator",
+			"Should Ethereum fork in the feature, the chainid will change however the one used by the permits will not enabling a user to use any new permits on both chains thus breaking the token on the forked chain permanently.",
+			"Please consult EIP1344 for more details: https://eips.ethereum.org/EIPS/eip-1344#rationale\nAnd the mitigation action that should be applied is the calculation of the chainid dynamically on each permit invocation. As a gas optimization, the deployment pre-calculated hash for the permits can be stored to an immutable variable and a validation can occur on the permit function that ensure the current chainid is equal to the one of the cached hash and if not, to re-calculate it on the spot.",
+			"EIP712_DOMAIN_TYPEHASH",
+		},
+		{
+			"L005",
+			GASOP,
+			"L-X: Unused/empty `receive()`/`fallback()` function",
+			"If the intention is for the Ether to be used, the function should call another function, otherwise, it should revert ",
+			"This is one example to fix this problem\ne.g. `require(msg.sender == address(weth))`",
+			"(fallback() external payable {} | fallback() external payable {}| fallback() external {})",
+		},
+		{
+			"L006",
+			GASOP,
+			"L-X: `abi.encodePacked()`should not be used in `keccak256()`",
+			"You have a risk of hash collisions.",
+			"You should use `abi.encode()` instead which will pad items to 32 bytes. Unless there is a compelling reason, `abi.encode` should be preferred. \nIf there is only one argument to `abi.encodePacked()` it can often be cast to bytes() or bytes32() instead.",
+			"keccak256(abi.encodePacked(",
+		},
+		{
+			"L007",
+			GASOP,
+			"L-X: rescueETH() cannot rescue Ether",
+			"rescueETH() sends `msg.value` to the destination address, which means it requires the caller of `rescueETH()` to provide the Ether to send. Essentially the owner is directly paying the destination address, and the Ether in the contract remains untouched",
+			"You should discuss how to solve this problem with your team.",
+			"rescueETH",
+		},
+		{
+			"L008",
+			GASOP,
+			"L-X: Check zero denominator",
+			"When a division is computed, it must be ensured that the denominator is non-zero to prevent failure of the function call.",
+			"Before doing these computations, add a non-zero check to these variables. Or alternatively, add a non-zero check inupdatePenalties().",
+			"/STRING",
+		},
+		{
+			"L009",
+			GASOP,
+			"L-X: `require()` should be used instead of `assert()`",
+			"Prior to solidity version 0.8.0, hitting an assert consumes the remainder of the transaction's available gas rather than returning it, as `require()`/`revert()` do. `assert()` should be avoided even past solidity version 0.8.0 as its [documentation](https://docs.soliditylang.org/en/v0.8.14/control-structures.html#panic-via-assert-and-error-via-require) states that The assert function creates an error of type Panic(uint256). ... Properly functioning code should never create a Panic, not even on invalid external input. If this happens, then there is a bug in your contract which you should fix",
+			"You should change from `assert()` to `require()`",
+			"THIS_IS_TARGET",
+		},
+		{
+			"L0010",
+			GASOP,
+			"L-X: pragma experimental ABIEncoderV2 is deprecated",
+			"The `pragma experimental ABIEncoderV2` is deprecated version.",
+			"You should use `pragma abicoder v2` instead instead of `pragma experimental ABIEncoderV2`",
+			"pragma experimental ABIEncoderV2",
+		},
+		{
+			"N001",
+			LOW,
+			"N-X: Do not use Deprecated Library Functions",
+			"[Deprecated](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/bfff03c0d2a59bcd8e2ead1da9aed9edf0080d05/contracts/token/ERC20/utils/SafeERC20.sol#L38-L44) in favor of safeIncreaseAllowance() and safeDecreaseAllowance(). If only setting the initial allowance to the value that means infinite, safeIncreaseAllowance() can be used instead",
+			"Use `safeIncreaseAllowance()` and `safeDecreaseAllowance()` instead of `safeApprove`",
+			`_setupRole\(|safeApprove\(`, // _setupRole and safeApprove are common deprecated lib functions
+		},
+		{
+			"N002",
+			LOW,
+			"N-X: Consider addings checks for signature malleability",
+			"You should consider addings checks for signature malleability",
+			"Use OpenZeppelin's `ECDSA` contract rather than calling `ecrecover()` directly",
+			" ecrecover",
+		},
+		{
+			"N003",
+			LOW,
+			"N-X: `require()/revert()` statements should have descriptive reason strings",
+			"If there is no statement, the user and frontend have no way to get the reason transaction failed.",
+			"You should add the statement.",
+			"require(_success);",//No string
+		},
+		{
+			"N004",
+			LOW,
+			"N-X: `type(uint<n>).max` should be used instead of`uint<n>(-1)`",
+			"Earlier versions of solidity can use `uint<n>(-1)` instead. Expressions not including the `- 1` can often be re-written to accomodate the change (e.g. by using a `>` rather than a `>=`, which will also save some gas)",
+			"You should change from `uint<n>(-1)` to `type(uint<n>).max`",
+			"uint<n>(-1)", //nに数字
+		},
+		{
+			"N005",
+			LOW,
+			"N-X: Non-assembly method available",
+			"You don't need to use assembly. `assembly` should be avoided as much as possible due to various risks",
+			"You can change as follows.\n `assembly{ id := chainid() } => uint256 id = block.chainid`, `assembly { size := extcodesize() } => uint256 size = address().code.length`",
+			"(id := chainid | size := extcodesize)",
+		},
+		{
+			"N006",
+			LOW,
+			"N-X: Constants should be defined rather than using magic numbers",
+			"Even [`assembly`](https://github.com/code-423n4/2022-05-opensea-seaport/blob/9d7ce4d08bf3c3010304a0476a785c70c0e90ae7/contracts/lib/TokenTransferrer.sol#L35-L39) can benefit from using readable constants instead of hex/numeric literals.\nAlso, it is bad practice to use numbers directly in code without explanation.",
+			"You should declare the variable instead of magic number.",
+			"NUMBERを検出",// むずいね
+		},
+		{
+			"N007",
+			LOW,
+			"N-X: Missing event and or timelock for critical parameter change",
+			"Events help non-contract tools to track changes, and events prevent users from being surprised by changes",
+			"You should add the event in the function to change the critical parameter.",
+			"set { non-event }",
+		},
+		{
+			"N008",
+			LOW,
+			"N-X: Expressions for constant values such as a call to `keccak256()`, should use `immutable` rather than `constant`",
+			"Expressions for constant values such as a call to `keccak256()`, should use `immutable` rather than `constant`",
+			"You should use immutable instead of constant",
+			"constant ** = keccak256",
+		},
+		{
+			"N009",
+			LOW,
+			"N-X: Non-library/interface files should use fixed compiler versions, not floating ones",
+			"Non-library/interface files should use fixed compiler versions, not floating ones",
+			"Delete the floating keyword `^`.",
+			"pragma solidity (\\^|>)", // "pragma solidity ^" or "pragma solidity >"
+		},
+		{
+			"N010",
+			LOW,
+			"N-X: Use scientific notation (e.g.`1e18`) rather than exponentiation (e.g.`10**18`)",
+			"Use scientific notation (e.g.`1e18`) rather than exponentiation (e.g.`10**18`)",
+			"Use scientific notation instead of exponentiation.",
+			"10**",
+		},
+		{
+			"N011",
+			LOW,
+			"N-X: Variable names that consist of all capital letters should be reserved for `constant/immutable` variables",
+			"Variable names that consist of all capital letters should be reserved for `constant/immutable` variables",
+			"Variables that are not constant/immutable should be declared in lower case",
+			"大文字",
+		},
+		{
+			"N012",
+			LOW,
+			"N-X: Open Todos",
+			"Code architecture, incentives, and error handling/reporting questions/issues should be resolved before deployment",
+			"Delete TODO keyword",
+			"TODO",
+		},
+		{
+			"N013",
+			LOW,
+			"N-X: No use of two-phase ownership transfers",
+			"Consider adding a two-phase transfer, where the current owner nominates the next owner, and the next owner has to call `accept*()` to become the new owner. This prevents passing the ownership to an account that is unable to use it.",
+			"Consider implementing a two step process where the admin nominates an account and the nominated account needs to call an acceptOwnership() function for the transfer of admin to fully succeed. This ensures the nominated EOA account is a valid and active account.",
+			"(admin = | owner = |Ownable)",
+		},
+		{
+			"N014",
+			LOW,
+			"N-X: Return values of `approve()` not checked",
+			"Not all `IERC20` implementations `revert()` when there's a failure in `transfer()/transferFrom()`. The function signature has a `boolean` return value and they indicate errors that way instead. By not checking the return value, operations that should have marked as failed, may potentially go through without actually making a payment",
+			"You should check whether the return value is true or false in terms of the security.",
+			".approve",// returnを確認していない
+		},
+		{
+			"N015",
+			LOW,
+			"N-X: Use a more recent version of solidity",
+			"Use a solidity version of at least 0.8.4 to get bytes.concat() instead of abi.encodePacked (<bytes>, <bytes>)\nUse a solidity version of at least 0.8.12 to get string.concat() instead of abi.encodePacked (<str>, <str>)\nUse a solidity version of at least 0.8.13 to get the ability to use using for with a list of free functions",
+			"Use more recent version of solidity.",
+			"0.6, 0.7, 0.8.0~9",
+		},
+		{
+			"N016",
+			LOW,
+			"N-X: Use `string.concat()` or`bytes.concat()`",
+			"Solidity version 0.8.4 introduces `bytes.concat()` (vs `abi.encodePacked(<bytes>,<bytes>)`)Solidity version 0.8.12 introduces `string.concat()`(vs `abi.encodePacked(<str>,<str>)`)",
+			"Use concat instead of abi.encodePacked",
+			"abi.encodePacked(",
+		},
+		{
+			"N017",
+			LOW,
+			"N-X: approve should be replaced with safeIncreaseAllowance() / safeDecreaseAllowance()",
+			"approve is subject to a known front-running attack. ",
+			"Consider using safeIncreaseAllowance () or safeDecreaseAllowance() instead.",
+			".approve",
+		},
 	}
 }
