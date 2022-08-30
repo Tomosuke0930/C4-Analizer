@@ -9,6 +9,7 @@ contract Test {
 
     function test() external {
         uint array[] = [1, 2, 3];
+        require(array.length > 0,"Edfdafjldka;fjadsljfdaslkjflkas;aaasjkjadlkfjdslalldkjadl");
         for (uint256 i = 0; i < array.length; i++) {
             i = i / 2;
         }
