@@ -78,20 +78,20 @@ func (r Report) Markdown() string {
 			continue
 		}
 
-		buf.WriteString("## " + issue.Title + "\n")
+		buf.WriteString("## ✅ " + issue.Title + "\n")
 		buf.WriteString("\n")
 
 		// Description
-		buf.WriteString("### Description\n")
+		buf.WriteString("### 📝 Description\n")
 		buf.WriteString( issue.Link  + "\n")
 		buf.WriteString("\n")
 
-		buf.WriteString("### Recommendation\n")
+		buf.WriteString("### 💡 Recommendation\n")
 		buf.WriteString( issue.Reco  + "\n")
 		buf.WriteString("\n")
 
 		// Findings
-		buf.WriteString("### Findings:\n")
+		buf.WriteString("### 🔍 Findings:\n")
 		// buf.WriteString("```\n")
 		for _, finding := range findings {
 			buf.WriteString(finding.String())
