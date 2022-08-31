@@ -24,7 +24,7 @@ func GasOpIssues() []Issue {
 			"G-X: Cache Array Length Outside of Loop",
 			"Caching the array length outside a loop saves reading it on each iteration, as long as the array's length is not changed during the loop.\nYou save 3 gas by not reading `array.length` - 3 gas per instance - 27 gas saved",
 			"Reco",
-			`.length; `,// 改善は必要 
+			"(.length;|>.length;)",//いかに.を表すのか？
 		},
 		// G003 - Use != 0 instead of > 0 for Unsigned Integer Comparison
 		{
@@ -33,7 +33,7 @@ func GasOpIssues() []Issue {
 			"G-X: Use != 0 instead of > 0 for Unsigned Integer Comparison",
 			"Use != 0 when comparing uint variables to zero, which cannot hold values below zero",
 			"You should change from `> 0` to  `!=0`.",
-			"(>0|> 0)",
+			">?0",
 		},
 		// G007 - Long Revert Strings
 		{
@@ -51,7 +51,7 @@ func GasOpIssues() []Issue {
 			"G-X: Use Shift Right/Left instead of Division/Multiplication if possible",
 			"A division/multiplication by any number `x` being a power of 2 can be calculated by shifting `log2(x)` to the right/left.\nWhile the `DIV` opcode uses 5 gas, the `SHR` opcode only uses 3 gas.\nurthermore, Solidity's division operation also includes a division-by-0 prevention which is bypassed using shifting.",
 			"Reco",
-			`(/[2,4,8]|/ [2,4,8]|\*[2,4,8]|\* [2,4,8])`,
+			`(/[2,4,8,16,32,64,128,256,512]|/ [2,4,8,16,32,64,128,256,512]|\*[2,4,8,16,32,64,128,256,512]|\* [2,4,8,16,32,64,128,256,512])`,
 		},
 		{
 			"G009",
@@ -59,7 +59,7 @@ func GasOpIssues() []Issue {
 			"G-X: Use assembly balance ETH",
 			"You can save 159 gas per instance if using assembly to check for balance of address",
 			"Please follow [this link](https://gist.github.com/Tomosuke0930/4547e012ece4575e88e2a6d2baf498fa) to make corrections",
-			").balance", 
+			".balance", 
 		},
 		{
 			"G010",
@@ -69,14 +69,14 @@ func GasOpIssues() []Issue {
 			"Please follow [this link](https://github.com/code-423n4/2022-06-putty-findings/issues/59) to make corrections",
 			"address(0)",
 		},
-		{
-			"G011",
-			GASOP,
-			"G-X: Use assembly for calculation (add, sub, mul, div)",
-			"See [this issue](https://github.com/code-423n4/2022-06-putty-findings/issues/59)\nYou can save about 4000 gas per instance in deploying contracrt.\nYou can save about 40~60  gas per instance if using assembly to execute the function.",
-			"Please follow [this link](https://gist.github.com/Tomosuke0930/a18e03c4ef20ff284dfca62e7ccf6f91) to make corrections",
-			"fdafdafdasfadsfdasf", //数字とかの計算についてはわからない +, -, / , *
-		},
+		// {
+		// 	"G011",
+		// 	GASOP,
+		// 	"G-X: Use assembly for calculation (add, sub, mul, div)",
+		// 	"See [this issue](https://github.com/code-423n4/2022-06-putty-findings/issues/59)\nYou can save about 4000 gas per instance in deploying contracrt.\nYou can save about 40~60  gas per instance if using assembly to execute the function.",
+		// 	"Please follow [this link](https://gist.github.com/Tomosuke0930/a18e03c4ef20ff284dfca62e7ccf6f91) to make corrections",
+		// 	"(+|-|/|*)",
+		// }, //こういうのどうしよう。。。
 		{
 			"G012",
 			GASOP,
@@ -107,7 +107,8 @@ func GasOpIssues() []Issue {
 			"G-X: Solidity Version should be the latest",
 			"Use a solidity version of at least 0.8.0 to get overflow protection without SafeMath\nUse a solidity version of at least 0.8.2 to get simple compiler automatic inlining\nUse a solidity version of at least 0.8.3 to get better struct packing and cheaper multiple storage reads\nUse a solidity version of at least 0.8.4 to get custom errors, which are cheaper at deployment than revert()/require() strings\nUse a solidity version of at least 0.8.10 to have external calls skip contract existence checks if the external call has a return value \n",
 			"You should consider with your team members whether you should choose the latest version.\nThe latest version has its advantages, but also it has disadvantages, such as the possibility of unknown bugs.",
-			"0.6, 0.7, 0.8.0~9",
+			// "0.6, 0.7, 0.8.0~9",
+			`(0\.[0-7]\.[0-9]|0\.8\.[0-9])`,
 		},
 		{
 			"G016",
@@ -115,7 +116,7 @@ func GasOpIssues() []Issue {
 			"G-X: Empty blocks should be removed or emit something",
 			"The code should be refactored such that they no longer exist, or the block should do something useful, such as emitting an event or reverting.",
 			"Empty blocks should be removed or emit something (The code should be refactored such that they no longer exist, or the block should do something useful, such as emitting an event or reverting.",
-			"{}",
+			`{}`,
 		},
 		{
 			"G017",
@@ -131,7 +132,7 @@ func GasOpIssues() []Issue {
 			"G-X: Use custom errors rather than revert()/require() strings to save gas",
 			"See [this issue](https://github.com/code-423n4/2022-06-putty-findings/issues/59).\nYou can save 7000 gas per instance in deploying contracrt.\nYou can save about 60 gas per instance if using assembly to execute the function.",
 			"You should change require to if&custom error in checking input value etc… \nPlease follow [this link](https://gist.github.com/Tomosuke0930/55d137c504d88f17e89e91111e22dcd6) to make corrections",
-			"require(",
+			`require(`,
 		},
 		{
 			"G019",
@@ -139,15 +140,15 @@ func GasOpIssues() []Issue {
 			"G-X: Splitting require() statements that use && saves gas",
 			"See [this issue](https://github.com/code-423n4/2022-01-xdefi-findings/issues/128) which describes the fact that there is a larger deployment gas cost, but with enough runtime calls, the change ends up being cheaper",
 			"You should change one require which has `&&` to two simple require() statements to save gas",
-			"require( &&)",
+			`\&\&`,
 		},
 		{
 			"G020",
 			GASOP,
-			"G-X: Use ++i instead of i++",
+			"G-X: Use `++i` instead of `i++`",
 			"You can get cheaper for loops (at least 25 gas, however can be up to 80 gas under certain conditions), by rewriting\nThe post-increment operation (i++) boils down to saving the original value of i, incrementing it and saving that to a temporary place in memory, and then returning the original value; only after that value is returned is the value of i actually updated (4 operations).On the other hand, in pre-increment doesn't need to store temporary(2 operations) so, the pre-increment operation uses less opcodes and is thus more gas efficient.",
 			"You should change from i++ to ++i.",
-			"i++, i ++,index ++, index++,",// stringとか--とか
+			`(\+\+|\s\+\+|\-\-|\s\-\-)`,// stringとか--とか
 		},
 		{
 			"G021",
@@ -155,7 +156,7 @@ func GasOpIssues() []Issue {
 			"G-X: Use x=x+y instad of x+=y",
 			"You can save about 35 gas per instance if you change from `x+=y**`** to `x=x+y`\nThis works equally well for subtraction, multiplication and division.",
 			"You should change from `x+=y` to `x=x+y`.",
-			"+=, -= *=, /=",
+			`(\+=| \-= | \*=| \/=)`,
 		},
 		{
 			"G022",
@@ -171,7 +172,7 @@ func GasOpIssues() []Issue {
 			"G-X: Use `indexed` for uint, bool, and address",
 			"Using the indexed keyword for value types such as uint, bool, and address saves gas costs, as seen in the example below. However, this is only the case for value types, whereas indexing bytes and strings are more expensive than their unindexed version.\nAlso indexed keyword has more merits.\nIt can be useful to have a way to monitor the contract's activity after it was deployed. One way to accomplish this is to look at all transactions of the contract, however that may be insufficient, as message calls between contracts are not recorded in the blockchain. Moreover, it shows only the input parameters, not the actual changes being made to the state. Also events could be used to trigger functions in the user interface.",
 			"Up to three `indexed` can be used per event and should be added.",
-			"event( indexed )",//non indexed
+			"event",//non indexed
 		},
 		// {
 		// 	"G024",
