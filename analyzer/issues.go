@@ -7,7 +7,7 @@ func AllIssues() []Issue {
 
 // GasOpIssues returns the list of all gas optimization issues.
 func GasOpIssues() []Issue {
-	return []Issue{
+	 return []Issue{
 		// G001 - Don't Initialize Variables with Default Value
 		{
 			"G001",
@@ -23,7 +23,7 @@ func GasOpIssues() []Issue {
 			GASOP,
 			"G-X: Cache Array Length Outside of Loop",
 			"Caching the array length outside a loop saves reading it on each iteration, as long as the array's length is not changed during the loop.\nYou save 3 gas by not reading `array.length` - 3 gas per instance - 27 gas saved",
-			"Reco",
+			"",
 			"(.length;|>.length;)",//いかに.を表すのか？
 		},
 		// G003 - Use != 0 instead of > 0 for Unsigned Integer Comparison
@@ -33,7 +33,7 @@ func GasOpIssues() []Issue {
 			"G-X: Use != 0 instead of > 0 for Unsigned Integer Comparison",
 			"Use != 0 when comparing uint variables to zero, which cannot hold values below zero",
 			"You should change from `> 0` to  `!=0`.",
-			">?0",
+			`(>0|>\s0)`,
 		},
 		// G007 - Long Revert Strings
 		{
@@ -50,7 +50,7 @@ func GasOpIssues() []Issue {
 			GASOP,
 			"G-X: Use Shift Right/Left instead of Division/Multiplication if possible",
 			"A division/multiplication by any number `x` being a power of 2 can be calculated by shifting `log2(x)` to the right/left.\nWhile the `DIV` opcode uses 5 gas, the `SHR` opcode only uses 3 gas.\nurthermore, Solidity's division operation also includes a division-by-0 prevention which is bypassed using shifting.",
-			"Reco",
+			"You should change multiplication and division by powers of two to bit shift.",
 			`(/[2,4,8,16,32,64,128,256,512]|/ [2,4,8,16,32,64,128,256,512]|\*[2,4,8,16,32,64,128,256,512]|\* [2,4,8,16,32,64,128,256,512])`,
 		},
 		{
@@ -59,7 +59,7 @@ func GasOpIssues() []Issue {
 			"G-X: Use assembly balance ETH",
 			"You can save 159 gas per instance if using assembly to check for balance of address",
 			"Please follow [this link](https://gist.github.com/Tomosuke0930/4547e012ece4575e88e2a6d2baf498fa) to make corrections",
-			".balance", 
+			`.balance`, 
 		},
 		{
 			"G010",
@@ -164,7 +164,7 @@ func GasOpIssues() []Issue {
 			"G-X: Use `uint256` instead of `bool`",
 			"Booleans are more expensive than uint256 or any type that takes up a full word because each write operation emits an extra SLOAD to first read the slot's contents, replace the bits taken up by the boolean, and then write back. This is the compiler's defense against contract upgrades and pointer aliasing, and it cannot be disabled.",
 			"You should change from bool to uint256 to save gas",
-			"bool",
+			`bool\s[a-z]`,
 		},
 		{
 			"G023",
@@ -174,14 +174,14 @@ func GasOpIssues() []Issue {
 			"Up to three `indexed` can be used per event and should be added.",
 			"event",//non indexed
 		},
-		// {
-		// 	"G024",
-		// 	GASOP,
-		// 	"G-X: TILE",
-		// 	"DESCRIPTION",
-		// 	"RECO",
-		// 	"THIS_IS_TARGET",
-		// },
+	// 	// {
+	// 	// 	"G024",
+	// 	// 	GASOP,
+	// 	// 	"G-X: TILE",
+	// 	// 	"DESCRIPTION",
+	// 	// 	"RECO",
+	// 	// 	"THIS_IS_TARGET",
+	// 	// },
 	}
 }
 
@@ -203,7 +203,7 @@ func LowRiskIssues() []Issue {
 			"L-X: `ecrecover()` not checked for signer address of zero",
 			"The `ecrecover()` function returns an address of zero when the signature does not match. This can cause problems if address zero is ever the owner of assets, and someone uses the permit function on address zero. ",
 			"You should check whether the return value is address(0) or not in terms of the security.",
-			"THIS_IS_TARGET", //ガンバ！
+			"ecrecover(", //ガンバ！
 		},
 		{
 			"L003",
@@ -251,7 +251,7 @@ func LowRiskIssues() []Issue {
 			"L-X: Check zero denominator",
 			"When a division is computed, it must be ensured that the denominator is non-zero to prevent failure of the function call.",
 			"Before doing these computations, add a non-zero check to these variables. Or alternatively, add a non-zero check inupdatePenalties().",
-			"/STRING",
+			"\\/[a-z,A-Z,0-9]",
 		},
 		{
 			"L009",
@@ -259,7 +259,7 @@ func LowRiskIssues() []Issue {
 			"L-X: `require()` should be used instead of `assert()`",
 			"Prior to solidity version 0.8.0, hitting an assert consumes the remainder of the transaction's available gas rather than returning it, as `require()`/`revert()` do. `assert()` should be avoided even past solidity version 0.8.0 as its [documentation](https://docs.soliditylang.org/en/v0.8.14/control-structures.html#panic-via-assert-and-error-via-require) states that The assert function creates an error of type Panic(uint256). ... Properly functioning code should never create a Panic, not even on invalid external input. If this happens, then there is a bug in your contract which you should fix",
 			"You should change from `assert()` to `require()`",
-			"THIS_IS_TARGET",
+			"assert",
 		},
 		{
 			"L0010",
@@ -283,23 +283,23 @@ func LowRiskIssues() []Issue {
 			"N-X: Consider addings checks for signature malleability",
 			"You should consider addings checks for signature malleability",
 			"Use OpenZeppelin's `ECDSA` contract rather than calling `ecrecover()` directly",
-			" ecrecover",
+			"ecrecover",
 		},
-		{
-			"N003",
-			LOW,
-			"N-X: `require()/revert()` statements should have descriptive reason strings",
-			"If there is no statement, the user and frontend have no way to get the reason transaction failed.",
-			"You should add the statement.",
-			"require(_success);",//No string
-		},
+		// {
+		// 	"N003",
+		// 	LOW,
+		// 	"N-X: `require()/revert()` statements should have descriptive reason strings",
+		// 	"If there is no statement, the user and frontend have no way to get the reason transaction failed.",
+		// 	"You should add the statement.",
+		// 	"require(_success);",//No string
+		// },
 		{
 			"N004",
 			LOW,
 			"N-X: `type(uint<n>).max` should be used instead of`uint<n>(-1)`",
 			"Earlier versions of solidity can use `uint<n>(-1)` instead. Expressions not including the `- 1` can often be re-written to accomodate the change (e.g. by using a `>` rather than a `>=`, which will also save some gas)",
 			"You should change from `uint<n>(-1)` to `type(uint<n>).max`",
-			"uint<n>(-1)", //nに数字
+			"uint[0-9](-1)", //nに数字
 		},
 		{
 			"N005",
@@ -309,29 +309,29 @@ func LowRiskIssues() []Issue {
 			"You can change as follows.\n `assembly{ id := chainid() } => uint256 id = block.chainid`, `assembly { size := extcodesize() } => uint256 size = address().code.length`",
 			"(id := chainid | size := extcodesize)",
 		},
-		{
-			"N006",
-			LOW,
-			"N-X: Constants should be defined rather than using magic numbers",
-			"Even [`assembly`](https://github.com/code-423n4/2022-05-opensea-seaport/blob/9d7ce4d08bf3c3010304a0476a785c70c0e90ae7/contracts/lib/TokenTransferrer.sol#L35-L39) can benefit from using readable constants instead of hex/numeric literals.\nAlso, it is bad practice to use numbers directly in code without explanation.",
-			"You should declare the variable instead of magic number.",
-			"NUMBERを検出",// むずいね
-		},
-		{
-			"N007",
-			LOW,
-			"N-X: Missing event and or timelock for critical parameter change",
-			"Events help non-contract tools to track changes, and events prevent users from being surprised by changes",
-			"You should add the event in the function to change the critical parameter.",
-			"set { non-event }",
-		},
+		// {
+		// 	"N006",
+		// 	LOW,
+		// 	"N-X: Constants should be defined rather than using magic numbers",
+		// 	"Even [`assembly`](https://github.com/code-423n4/2022-05-opensea-seaport/blob/9d7ce4d08bf3c3010304a0476a785c70c0e90ae7/contracts/lib/TokenTransferrer.sol#L35-L39) can benefit from using readable constants instead of hex/numeric literals.\nAlso, it is bad practice to use numbers directly in code without explanation.",
+		// 	"You should declare the variable instead of magic number.",
+		// 	"NUMBERを検出",// むずいね
+		// },
+		// {
+		// 	"N007",
+		// 	LOW,
+		// 	"N-X: Missing event and or timelock for critical parameter change",
+		// 	"Events help non-contract tools to track changes, and events prevent users from being surprised by changes",
+		// 	"You should add the event in the function to change the critical parameter.",
+		// 	"set {}",
+		// },
 		{
 			"N008",
 			LOW,
 			"N-X: Expressions for constant values such as a call to `keccak256()`, should use `immutable` rather than `constant`",
 			"Expressions for constant values such as a call to `keccak256()`, should use `immutable` rather than `constant`",
 			"You should use immutable instead of constant",
-			"constant ** = keccak256",
+			"constant", //keccak使ってないか
 		},
 		{
 			"N009",
@@ -355,7 +355,7 @@ func LowRiskIssues() []Issue {
 			"N-X: Variable names that consist of all capital letters should be reserved for `constant/immutable` variables",
 			"Variable names that consist of all capital letters should be reserved for `constant/immutable` variables",
 			"Variables that are not constant/immutable should be declared in lower case",
-			"大文字",
+			"(public|private) [A-Z]",
 		},
 		{
 			"N012",
@@ -373,21 +373,21 @@ func LowRiskIssues() []Issue {
 			"Consider implementing a two step process where the admin nominates an account and the nominated account needs to call an acceptOwnership() function for the transfer of admin to fully succeed. This ensures the nominated EOA account is a valid and active account.",
 			"(admin = | owner = |Ownable)",
 		},
-		{
-			"N014",
-			LOW,
-			"N-X: Return values of `approve()` not checked",
-			"Not all `IERC20` implementations `revert()` when there's a failure in `transfer()/transferFrom()`. The function signature has a `boolean` return value and they indicate errors that way instead. By not checking the return value, operations that should have marked as failed, may potentially go through without actually making a payment",
-			"You should check whether the return value is true or false in terms of the security.",
-			".approve",// returnを確認していない
-		},
+		// {
+		// 	"N014",
+		// 	LOW,
+		// 	"N-X: Return values of `approve()` not checked",
+		// 	"Not all `IERC20` implementations `revert()` when there's a failure in `transfer()/transferFrom()`. The function signature has a `boolean` return value and they indicate errors that way instead. By not checking the return value, operations that should have marked as failed, may potentially go through without actually making a payment",
+		// 	"You should check whether the return value is true or false in terms of the security.",
+		// 	".approve",// returnを確認していない
+		// },
 		{
 			"N015",
 			LOW,
 			"N-X: Use a more recent version of solidity",
 			"Use a solidity version of at least 0.8.4 to get bytes.concat() instead of abi.encodePacked (<bytes>, <bytes>)\nUse a solidity version of at least 0.8.12 to get string.concat() instead of abi.encodePacked (<str>, <str>)\nUse a solidity version of at least 0.8.13 to get the ability to use using for with a list of free functions",
 			"Use more recent version of solidity.",
-			"0.6, 0.7, 0.8.0~9",
+			`(0\.[0-7]\.[0-9]|0\.8\.[0-9])`,
 		},
 		{
 			"N016",
@@ -395,7 +395,7 @@ func LowRiskIssues() []Issue {
 			"N-X: Use `string.concat()` or`bytes.concat()`",
 			"Solidity version 0.8.4 introduces `bytes.concat()` (vs `abi.encodePacked(<bytes>,<bytes>)`)Solidity version 0.8.12 introduces `string.concat()`(vs `abi.encodePacked(<str>,<str>)`)",
 			"Use concat instead of abi.encodePacked",
-			"abi.encodePacked(",
+			"abi.encodePacked",
 		},
 		{
 			"N017",
